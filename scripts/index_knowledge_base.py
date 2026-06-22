@@ -17,8 +17,10 @@ COLLECTION_NAME = "agroclimate_knowledge_base"
 
 def index_knowledge_base():
 
+    print("Carregando PDFs")
     documents = load_pdf_documents(str(DOCS_DIR))
 
+    print("Fazendo chunking")
     chunks = chunk_documents(documents)
 
     embedding_model = EmbeddingModel()
@@ -31,6 +33,7 @@ def index_knowledge_base():
         for meta in metadatas
     ]
 
+    print("Gerando embeddings")
     embeddings = embedding_model.embed_texts(texts)
 
     VECTORSTORE_DIR.mkdir(parents=True, exist_ok=True)
@@ -39,15 +42,16 @@ def index_knowledge_base():
         path=str(VECTORSTORE_DIR)
     )
 
-    try:
+    existing_collections = [c.name for c in client.list_collections()]
+
+    if COLLECTION_NAME in existing_collections:
         client.delete_collection(COLLECTION_NAME)
-    except Exception:
-        pass
 
     collection = client.create_collection(
         name=COLLECTION_NAME
     )
 
+    print("Salvando no vectorstore")
     collection.add(
         ids=ids,
         documents=texts,
@@ -55,7 +59,8 @@ def index_knowledge_base():
         metadatas=metadatas,
     )
 
-    print(f"base salva em: {VECTORSTORE_DIR}")
+    print(f"Base salva em: {VECTORSTORE_DIR}")
+    print(f"Total chunks indexados: {len(chunks)}")
 
 
 if __name__ == "__main__":
