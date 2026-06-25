@@ -12,7 +12,7 @@ Exemplos de execução:
 - Análise geral de um ano específico:
   python scripts/inmet_data_analysis.py 2025
 
-- Análise filtrada por UF e estação:
+- Análise filtrada por UF e/ou estação:
   python scripts/inmet_data_analysis.py 2025 RS PASSO FUNDO
 
 # Os relatórios estão disponíveis em: data/data_analysis/ no repositório do projeto.
@@ -37,7 +37,7 @@ _CANDIDATE_DATA_DIRS = [
 ]
 DATA_INMET_DIR = next((p for p in _CANDIDATE_DATA_DIRS if os.path.isdir(p)),
                       _CANDIDATE_DATA_DIRS[0])
-OUTPUT_DIR = os.path.join(os.path.dirname(DATA_INMET_DIR), "data_analysis")
+OUTPUT_DIR = os.path.join(os.path.dirname(DATA_INMET_DIR), "data_analysis/raw_data")
 
 ENCODING = "latin-1"
 DELIMITER = ";"

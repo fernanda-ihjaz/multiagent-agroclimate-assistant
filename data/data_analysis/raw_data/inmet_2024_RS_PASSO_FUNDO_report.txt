@@ -1,0 +1,134 @@
+RELATÓRIO INMET — PASSO FUNDO (RS)
+Ano: 2024   |   Gerado em: 2026-06-25 12:17:15
+-----------------------------------
+VISÃO GERAL
+Arquivos : 1
+Linhas   : 8.784
+Colunas  : 19
+Volume   : 0,77 MB
+-----------------------------------
+COBERTURA TEMPORAL
+Período         : 2024-01-01 a 2024-12-31
+Intervalo       : 366 dia(s)
+Dias com dados  : 366
+-----------------------------------
+FREQUÊNCIA DOS REGISTROS
+Frequência predominante : horária (100,0% dos intervalos)
+-----------------------------------
+COBERTURA GEOGRÁFICA
+Estações : 1
+UFs      : 1 (RS)
+Latitude  : -28,2267 a -28,2267
+Longitude : -52,4036 a -52,4036
+-----------------------------------
+COLUNAS (nome, tipo, ausentes, únicos)
+[01] Data
+     canônico: DATA | tipo: data | ausentes: 0 (0,0%) | únicos: 366
+[02] Hora UTC
+     canônico: HORA_UTC | tipo: texto | ausentes: 0 (0,0%) | únicos: 24
+[03] PRECIPITAÇÃO TOTAL, HORÁRIO (mm)
+     canônico: PRECIPITACAO_TOTAL | tipo: decimal | ausentes: 71 (0,8%) | únicos: 82
+[04] PRESSAO ATMOSFERICA AO NIVEL DA ESTACAO, HORARIA (mB)
+     canônico: PRESSAO_ATM_ESTACAO | tipo: decimal | ausentes: 71 (0,8%) | únicos: 249
+[05] PRESSÃO ATMOSFERICA MAX.NA HORA ANT. (AUT) (mB)
+     canônico: PRESSAO_ATM_MAX | tipo: decimal | ausentes: 74 (0,8%) | únicos: 241
+[06] PRESSÃO ATMOSFERICA MIN. NA HORA ANT. (AUT) (mB)
+     canônico: PRESSAO_ATM_MIN | tipo: decimal | ausentes: 74 (0,8%) | únicos: 246
+[07] RADIACAO GLOBAL (Kj/m²)
+     canônico: RADIACAO_GLOBAL | tipo: decimal | ausentes: 4.003 (45,6%) | únicos: 4.128
+[08] TEMPERATURA DO AR - BULBO SECO, HORARIA (°C)
+     canônico: TEMP_AR_BULBO_SECO | tipo: decimal | ausentes: 71 (0,8%) | únicos: 316
+[09] TEMPERATURA DO PONTO DE ORVALHO (°C)
+     canônico: TEMP_PONTO_ORVALHO | tipo: decimal | ausentes: 71 (0,8%) | únicos: 267
+[10] TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)
+     canônico: TEMP_MAX | tipo: decimal | ausentes: 74 (0,8%) | únicos: 322
+[11] TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)
+     canônico: TEMP_MIN | tipo: decimal | ausentes: 74 (0,8%) | únicos: 315
+[12] TEMPERATURA ORVALHO MAX. NA HORA ANT. (AUT) (°C)
+     canônico: TEMP_ORVALHO_MAX | tipo: decimal | ausentes: 74 (0,8%) | únicos: 268
+[13] TEMPERATURA ORVALHO MIN. NA HORA ANT. (AUT) (°C)
+     canônico: TEMP_ORVALHO_MIN | tipo: decimal | ausentes: 74 (0,8%) | únicos: 264
+[14] UMIDADE REL. MAX. NA HORA ANT. (AUT) (%)
+     canônico: UMIDADE_REL_MAX | tipo: inteiro | ausentes: 74 (0,8%) | únicos: 73
+[15] UMIDADE REL. MIN. NA HORA ANT. (AUT) (%)
+     canônico: UMIDADE_REL_MIN | tipo: inteiro | ausentes: 74 (0,8%) | únicos: 78
+[16] UMIDADE RELATIVA DO AR, HORARIA (%)
+     canônico: UMIDADE_REL_HORARIA | tipo: inteiro | ausentes: 71 (0,8%) | únicos: 76
+[17] VENTO, DIREÇÃO HORARIA (gr) (° (gr))
+     canônico: VENTO_DIRECAO | tipo: inteiro | ausentes: 72 (0,8%) | únicos: 360
+[18] VENTO, RAJADA MAXIMA (m/s)
+     canônico: VENTO_RAJADA_MAX | tipo: decimal | ausentes: 77 (0,9%) | únicos: 176
+[19] VENTO, VELOCIDADE HORARIA (m/s)
+     canônico: VENTO_VELOCIDADE | tipo: decimal | ausentes: 72 (0,8%) | únicos: 103
+-----------------------------------
+ESTATÍSTICAS NUMÉRICAS (mín, máx, média, mediana)
+COLUNA                UN            MÍN        MÁX      MÉDIA    MEDIANA
+PRECIPITACAO_TOTAL    mm           0,00      27,40       0,28      0,00
+PRESSAO_ATM_ESTACAO   mB         923,50     950,50     937,31    936,90
+PRESSAO_ATM_MAX       mB         924,10     950,50     937,58    937,20
+PRESSAO_ATM_MIN       mB         922,90     950,10     937,04    936,70
+RADIACAO_GLOBAL       Kj/m2        0,00   4.105,90   1.209,80    901,90
+TEMP_AR_BULBO_SECO    C           -0,70      33,40      18,74     19,10
+TEMP_PONTO_ORVALHO    C           -6,20      23,80      14,36     15,20
+TEMP_MAX              C           -0,50      34,00      19,31     19,60
+TEMP_MIN              C           -0,90      32,40      18,20     18,70
+TEMP_ORVALHO_MAX      C           -4,60      24,20      14,86     15,70
+TEMP_ORVALHO_MIN      C           -8,50      22,80      13,90     14,70
+UMIDADE_REL_MAX       %           27,00      99,00      80,56     85,00
+UMIDADE_REL_MIN       %           22,00      99,00      75,31     80,00
+UMIDADE_REL_HORARIA   %           24,00      99,00      77,97     82,00
+VENTO_DIRECAO         gr           1,00     360,00     131,63    103,00
+VENTO_RAJADA_MAX      m/s          0,00      25,40       6,48      6,30
+VENTO_VELOCIDADE      m/s          0,00      11,60       3,00      3,00
+-----------------------------------
+DISTRIBUIÇÃO DOS DADOS (histograma min→max)
+PRECIPITACAO_TOTAL     █▂▂▂▂▂▂▂▂▂▂▂  [0,0 a 27,4]
+PRESSAO_ATM_ESTACAO    ▂▂▂▃▆██▅▄▃▂▂  [923,5 a 950,5]
+PRESSAO_ATM_MAX        ▂▂▂▃▆█▇▄▄▃▂▂  [924,1 a 950,5]
+PRESSAO_ATM_MIN        ▂▂▂▃▆██▅▄▃▂▂  [922,9 a 950,1]
+RADIACAO_GLOBAL        █▄▃▃▃▃▃▃▃▂▂▂  [0,0 a 4.105,9]
+TEMP_AR_BULBO_SECO     ▂▂▃▃▄▅██▅▄▃▂  [-0,7 a 33,4]
+TEMP_PONTO_ORVALHO     ▂▂▂▂▃▃▄▆██▆▂  [-6,2 a 23,8]
+TEMP_MAX               ▂▂▃▃▄▅██▆▄▃▂  [-0,5 a 34,0]
+TEMP_MIN               ▂▂▃▃▃▅██▆▄▃▂  [-0,9 a 32,4]
+TEMP_ORVALHO_MAX       ▂▂▂▂▃▃▅▇██▆▂  [-4,6 a 24,2]
+TEMP_ORVALHO_MIN       ▂▂▂▂▂▃▄▅██▇▃  [-8,5 a 22,8]
+UMIDADE_REL_MAX        ▂▂▂▂▂▃▃▄▄▅▆█  [27,0 a 99,0]
+UMIDADE_REL_MIN        ▂▂▃▃▄▄▄▅▆▇██  [22,0 a 99,0]
+UMIDADE_REL_HORARIA    ▂▂▂▂▃▃▄▄▅▅▇█  [24,0 a 99,0]
+VENTO_DIRECAO          ▄██▅▇▃▃▃▃▃▃▃  [1,0 a 360,0]
+VENTO_RAJADA_MAX       ▂▅██▅▂▂▂▂▂▂▂  [0,0 a 25,4]
+VENTO_VELOCIDADE       ▄▆██▇▄▂▂▂▂▂▂  [0,0 a 11,6]
+-----------------------------------
+OUTLIERS (regra do IQR, fora de Q1-1.5*IQR .. Q3+1.5*IQR)
+PRECIPITACAO_TOTAL            0 (0,0%) | faixa esperada: [0,0 a 0,0]
+PRESSAO_ATM_ESTACAO         108 (1,2%) | faixa esperada: [927,4 a 947,0]
+PRESSAO_ATM_MAX             116 (1,3%) | faixa esperada: [927,8 a 947,0]
+PRESSAO_ATM_MIN             123 (1,4%) | faixa esperada: [927,3 a 946,5]
+RADIACAO_GLOBAL               0 (0,0%) | faixa esperada: [-2.600,0 a 4.883,7]
+TEMP_AR_BULBO_SECO          159 (1,8%) | faixa esperada: [5,2 a 32,9]
+TEMP_PONTO_ORVALHO          210 (2,4%) | faixa esperada: [2,7 a 27,0]
+TEMP_MAX                    151 (1,7%) | faixa esperada: [5,5 a 33,8]
+TEMP_MIN                    236 (2,7%) | faixa esperada: [5,4 a 31,4]
+TEMP_ORVALHO_MAX            210 (2,4%) | faixa esperada: [3,4 a 27,4]
+TEMP_ORVALHO_MIN            218 (2,5%) | faixa esperada: [2,0 a 26,8]
+UMIDADE_REL_MAX              71 (0,8%) | faixa esperada: [38,0 a 126,0]
+UMIDADE_REL_MIN               2 (0,0%) | faixa esperada: [22,5 a 130,5]
+UMIDADE_REL_HORARIA          20 (0,2%) | faixa esperada: [29,5 a 129,5]
+VENTO_DIRECAO                 0 (0,0%) | faixa esperada: [-127,4 a 369,6]
+VENTO_RAJADA_MAX            104 (1,2%) | faixa esperada: [-0,4 a 13,2]
+VENTO_VELOCIDADE             79 (0,9%) | faixa esperada: [-1,3 a 7,2]
+-----------------------------------
+REGISTROS DUPLICADOS
+Registros com (Data, Hora) repetida : 0 (0,00%)
+-----------------------------------
+CONSISTÊNCIA DOS DADOS
+Esquema de colunas idêntico em todos os arquivos : sim
+Valores não numéricos em colunas numéricas       : 0
+Valores fora da faixa física esperada            : 0
+-----------------------------------
+QUALIDADE GERAL DOS DADOS
+Completude (células preenchidas) : 96,9%
+Duplicidade                      : 0,00%
+Valores inválidos                : 0
+Classificação geral              : Excelente
