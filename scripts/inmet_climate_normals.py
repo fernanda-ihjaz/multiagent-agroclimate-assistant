@@ -49,6 +49,6 @@ def calculate_climatological_normals(input_path: Path, output_path: Path):
 if __name__ == "__main__":
     BASE_DIR = Path(__file__).resolve().parent.parent
     INPUT_FILE = BASE_DIR / "data/inmet" / "inmet_rs_cleaned.parquet"
-    OUTPUT_FILE = BASE_DIR / "data/data_analysis" / "inmet_normals.parquet"
+    OUTPUT_FILE = BASE_DIR / "data/inmet" / "inmet_normals.parquet"
     
     calculate_climatological_normals(INPUT_FILE, OUTPUT_FILE)
