@@ -44,3 +44,4 @@ data/vectorstore/
 # Logs e Relatórios Gerados
 *.log
 *.pdf.log
+resultado_indices.json

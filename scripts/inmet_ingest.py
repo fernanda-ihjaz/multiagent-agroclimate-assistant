@@ -29,7 +29,6 @@ def normalize_column_name(name: str) -> str:
         .upper()
     )
 
-# Lê um arquivo bruto do INMET e retorna um DataFrame
 def read_inmet_file(filepath: str | Path) -> pd.DataFrame:
     filepath = Path(filepath)
 
@@ -142,7 +141,6 @@ def read_inmet_file(filepath: str | Path) -> pd.DataFrame:
 
     return df
 
-# Carrega todos os arquivos encontrados recursivamente
 def load_inmet_folder(folder: str | Path) -> pd.DataFrame:
     folder = Path(folder)
 
@@ -185,7 +183,6 @@ if __name__ == "__main__":
 
     df = load_inmet_folder("data/inmet")
 
-    # Colunas categóricas para reduzir tamanho do Parquet
     for col in [
         "UF",
         "REGIAO",

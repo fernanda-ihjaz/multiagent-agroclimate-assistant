@@ -15,7 +15,6 @@ def clean_inmet_data(input_path: Path, output_path: Path):
         
     df = pd.read_parquet(input_path)
 
-    # Identifica colunas de medição climática baseada nos prefixos de interesse do INMET
     prefixos_alvo = ["TEMPERATURA", "PRECIPITACAO", "UMIDADE", "VENTO", "RADIACAO", "PRESSAO"]
     colunas_numericas = [
         col for col in df.columns 
@@ -34,7 +33,7 @@ def clean_inmet_data(input_path: Path, output_path: Path):
         # O INMET preenche falhas de sensor com valores espúrios negativos como -9999
         df.loc[df[col] <= -9000, col] = np.nan
 
-    # Ordenação temporal para garantir consistência em cálculos de janelas (rolling) futuros
+    # Ordenação temporal para garantir consistência em cálculos de janelas
     if 'DATETIME' in df.columns and 'ESTACAO' in df.columns:
         df = df.sort_values(by=['ESTACAO', 'DATETIME']).reset_index(drop=True)
 
