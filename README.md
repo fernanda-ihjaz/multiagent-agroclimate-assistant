@@ -3,7 +3,6 @@ Projeto final de Inteligência Artificial: um sistema multiagente com LLMs locai
 RAG e MCP para apoio à decisão agroclimática (trigo/soja) na região de Passo Fundo (RS).
 ## 👥 Equipe
 - Fernanda Japur Ihjaz
-- Érica Pilati Sartoreto
 - Maria Eduarda Schell
 ## 🚀 Tecnologias e Pré-requisitos
 - **Python 3.10+**

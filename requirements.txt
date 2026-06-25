@@ -1,0 +1,9 @@
+pypdf==6.13.2 # extração de texto dos PDF's
+chromadb==1.5.9 # banco vetorial para armazenar os embeddings e documentos
+sentence-transformers==5.6.0 # geração de embeddings para os textos 
+langchain==1.3.9 # para construção de aplicações com LLMs e RAG
+langchain-community==0.4.2 
+ollama==0.5.3 # integração Python com Ollama local
+typer==0.20.0
+numpy
+torch

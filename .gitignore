@@ -2,7 +2,7 @@
 venv/
 env/
 .venv/
-__pypackages__/
+_pypackages_/
 
 # Caches e Artefatos Python
 __pycache__/
@@ -38,8 +38,8 @@ htmlcov/
 
 # Dados do Projeto e Banco Vetorial (RAG)
 data/vectorstore/
-data/inmet/*
-data/docs/*
+# data/inmet/*
+# data/docs/*
 
 # Logs e Relatórios Gerados
 *.log
