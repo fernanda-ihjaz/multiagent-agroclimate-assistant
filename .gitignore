@@ -38,8 +38,8 @@ htmlcov/
 
 # Dados do Projeto e Banco Vetorial (RAG)
 data/vectorstore/
-data/inmet/*.csv
-data/docs/*.pdf
+data/inmet/*
+data/docs/*
 
 # Logs e Relatórios Gerados
 *.log
