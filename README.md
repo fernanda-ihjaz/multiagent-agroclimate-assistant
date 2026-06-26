@@ -1,4 +1,12 @@
+<p align="left">
+  <img src="logo.png" width="80" align="left" style="margin-right: 15px;">
+</p>
+
 # Assistente Agroclimático Multiagente
+
+# Assistente Agroclimático Multiagente
+</table>
+
 Projeto final de Inteligência Artificial: um sistema multiagente com LLMs locais (Ollama),
 RAG e MCP para apoio à decisão agroclimática (trigo/soja) na região de Passo Fundo (RS).
 ## 👥 Equipe
