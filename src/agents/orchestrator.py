@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from src.agents.intent_agent import IntentAgent
 from src.agents.climatology_agent import ClimatologyAgent
 from src.agents.rag_agent import RAGAgent
 from src.agents.risk_assessment_agent import RiskAssessmentAgent
@@ -10,6 +10,7 @@ from src.rag.retriever import Retriever
 class OrchestratorAgent:
 
     def __init__(self):
+        self.intent_agent = IntentAgent()
         self.retriever = Retriever()
         self.climatology_agent = ClimatologyAgent()
         self.rag_agent = RAGAgent()
@@ -27,19 +28,14 @@ class OrchestratorAgent:
         for doc, meta in zip(documents, metadatas):
             filename = meta.get("filename", "fonte_desconhecida")
             page = meta.get("page", "?")
-            category = meta.get("category", "?")
-            parts.append(
-                f"Fonte: [{filename}, página {page}]\n"
-                f"Categoria: {category}\n"
-                f"Trecho:\n{doc}"
-            )
+            parts.append(f"[{filename}, página {page}]\n{doc}")
 
-        return "\n\n---\n\n".join(parts)
+        return "\n\n".join(parts)
 
     def run(
         self,
         question: str,
-        cultura: str = "trigo",
+        cultura: str = None,
         data_inicio: str = None,
         data_fim: str = None,
         estacao: str = "PASSO FUNDO",
@@ -47,22 +43,40 @@ class OrchestratorAgent:
         top_k: int = 5,
         include_risk: bool = True
     ):
-        today = datetime.today()
-        if data_fim is None:
-            data_fim = today.strftime("%Y-%m-%d")
-        if data_inicio is None:
-            data_inicio = (today - timedelta(days=30)).strftime("%Y-%m-%d")
+        intent = self.intent_agent.run(question)
 
-        climatology_result = self.climatology_agent.run(
+        cultura_final = cultura or intent.get("cultura", "trigo")
+        data_inicio_final = data_inicio or intent.get("data_inicio")
+        data_fim_final = data_fim or intent.get("data_fim")
+        doenca = intent.get("doenca")
+        tem_comparacao = intent.get("tem_comparacao", False)
+        data_inicio_comp = intent.get("data_inicio_comparacao")
+        data_fim_comp = intent.get("data_fim_comparacao")
+
+        clim_principal = self.climatology_agent.run(
             question=question,
-            cultura=cultura,
-            data_inicio=data_inicio,
-            data_fim=data_fim,
+            cultura=cultura_final,
+            data_inicio=data_inicio_final,
+            data_fim=data_fim_final,
             estacao=estacao
         )
 
+        clim_comparacao = None
+        if tem_comparacao and data_inicio_comp and data_fim_comp:
+            clim_comparacao = self.climatology_agent.run(
+                question=question,
+                cultura=cultura_final,
+                data_inicio=data_inicio_comp,
+                data_fim=data_fim_comp,
+                estacao=estacao
+            )
+
+        query_rag = question
+        if doenca:
+            query_rag = f"{doenca} {cultura_final} condições climáticas risco {question}"
+
         retrieved = self.retriever.search(
-            query=question,
+            query=query_rag,
             top_k=top_k,
             category=category
         )
@@ -70,37 +84,28 @@ class OrchestratorAgent:
         context = self._build_context(retrieved)
 
         if not context:
-            return "Não encontrei documentos relevantes na base vetorial para responder com segurança."
+            rag_answer = "Não encontrei documentos relevantes na base vetorial para complementar a análise climática."
+        else:
+            rag_answer = self.rag_agent.run(question=question, context=context)
 
-        rag_answer = self.rag_agent.run(question=question, context=context)
+        synthesis_parts = {
+            "pergunta": question,
+            "cultura": cultura_final,
+            "periodo_principal": f"{data_inicio_final} a {data_fim_final}",
+            "estacao": estacao,
+            "indices_principais": clim_principal.get("indices", {}),
+            "analise_climatologica_principal": clim_principal.get("interpretation", ""),
+            "conhecimento_documental": rag_answer,
+        }
 
-        clim_interp = climatology_result["interpretation"]
-        clim_indices = json.dumps(
-            climatology_result["indices"], indent=2, ensure_ascii=False
-        )
+        if clim_comparacao:
+            synthesis_parts["periodo_comparacao"] = f"{data_inicio_comp} a {data_fim_comp}"
+            synthesis_parts["indices_comparacao"] = clim_comparacao.get("indices", {})
+            synthesis_parts["analise_climatologica_comparacao"] = clim_comparacao.get("interpretation", "")
 
         if include_risk:
-            risk_scenario = (
-                f"Pergunta do usuário:\n{question}\n\n"
-                f"Índices agroclimáticos calculados ({data_inicio} a {data_fim} | estação: {estacao}):\n"
-                f"{clim_indices}\n\n"
-                f"Análise climatológica:\n{clim_interp}\n\n"
-                f"Conhecimento técnico recuperado da base documental:\n{rag_answer}"
-            )
+            risk_input = json.dumps(synthesis_parts, indent=2, ensure_ascii=False)
+            risk_answer = self.risk_agent.run(scenario=risk_input)
+            synthesis_parts["avaliacao_de_risco"] = risk_answer
 
-            risk_answer = self.risk_agent.run(scenario=risk_scenario)
-
-            combined = (
-                f"Análise climatológica ({data_inicio} a {data_fim}):\n\n"
-                f"{clim_interp}\n\n---\n\n"
-                f"Base documental:\n\n{rag_answer}\n\n---\n\n"
-                f"Avaliação de risco:\n\n{risk_answer}"
-            )
-        else:
-            combined = (
-                f"Análise climatológica ({data_inicio} a {data_fim}):\n\n"
-                f"{clim_interp}\n\n---\n\n"
-                f"Base documental:\n\n{rag_answer}"
-            )
-
-        return self.review_agent.run(answer=combined)
+        return self.review_agent.run(synthesis=synthesis_parts, question=question)

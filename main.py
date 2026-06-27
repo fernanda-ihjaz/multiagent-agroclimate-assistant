@@ -8,17 +8,15 @@ app = typer.Typer(
     help="Assistente agroclimático multiagente com RAG e LLM local."
 )
 
-@app.command()
 
+@app.command()
 def indexar():
     logger.info("Comando: indexar")
 
     try:
         with timer("Indexação da base de conhecimento"):
             index_knowledge_base()
-
         logger.info("Indexação concluída com sucesso.")
-
     except Exception:
         exception("Erro durante a indexação.")
         raise
@@ -31,22 +29,22 @@ def perguntar(
         help="Pergunta para o assistente agroclimático."
     ),
     cultura: str = typer.Option(
-        "trigo",
+        None,
         "--cultura",
         "-u",
-        help="Cultura analisada: trigo ou soja."
+        help="Força a cultura analisada: trigo ou soja. Se omitido, é inferido da pergunta."
     ),
     data_inicio: str = typer.Option(
         None,
         "--inicio",
         "-i",
-        help="Data de início no formato YYYY-MM-DD."
+        help="Força a data de início (YYYY-MM-DD). Se omitido, é inferido da pergunta."
     ),
     data_fim: str = typer.Option(
         None,
         "--fim",
         "-f",
-        help="Data de fim no formato YYYY-MM-DD."
+        help="Força a data de fim (YYYY-MM-DD). Se omitido, é inferido da pergunta."
     ),
     estacao: str = typer.Option(
         "PASSO FUNDO",
@@ -72,21 +70,13 @@ def perguntar(
         help="Inclui ou não avaliação de risco."
     )
 ):
-
     logger.info("=" * 80)
     logger.info("Nova consulta")
-    logger.info(f"Pergunta      : {pergunta}")
-    logger.info(f"Cultura       : {cultura}")
-    logger.info(f"Período       : {data_inicio} -> {data_fim}")
-    logger.info(f"Estação       : {estacao}")
-    logger.info(f"Categoria RAG : {categoria}")
-    logger.info(f"Top K         : {top_k}")
-    logger.info(f"Incluir risco : {incluir_risco}")
+    logger.info(f"Pergunta : {pergunta}")
+    logger.info(f"Estação  : {estacao}")
 
     try:
-
         with timer("Execução completa da consulta"):
-
             agent = OrchestratorAgent()
 
             resposta = agent.run(
@@ -100,9 +90,7 @@ def perguntar(
                 include_risk=incluir_risco
             )
 
-        logger.info("Consulta finalizada com sucesso.")
-        logger.info(f"Tamanho da resposta: {len(resposta)} caracteres")
-
+        logger.info(f"Resposta gerada: {len(resposta)} caracteres")
         typer.echo(resposta)
 
     except Exception:
