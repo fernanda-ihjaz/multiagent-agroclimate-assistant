@@ -1,39 +1,45 @@
-from sentence_transformers import SentenceTransformer
-
+from ollama import embed
 
 class EmbeddingModel:
 
-    def __init__(
-        self,
-        model_name: str = "BAAI/bge-m3" #melhores respostas em portugues
-    ):
+    def __init__(self, model_name: str = "nomic-embed-text"):
         self.model_name = model_name
-        self.model = SentenceTransformer(model_name)
 
-    def embed_texts(self, texts):
-        #gera embeddings normalizados para uma lista de textos.
+    def embed_texts(self, texts: list, batch_size: int = 16) -> list:
+        """
+        Gera embeddings para uma lista de textos em lotes.
+        Mantém a mesma interface da implementação anterior.
+        """
         if not texts:
             return []
 
-        embeddings = self.model.encode(
-            texts,
-            show_progress_bar=True,
-            normalize_embeddings=True
-        )
+        all_embeddings = []
 
-        return embeddings.tolist()
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
 
-    def embed_query(self, query: str):
+            response = embed(
+                model=self.model_name,
+                input=batch
+            )
 
-        #gera embedding normalizado para uma pergunta do usuário.
+            all_embeddings.extend(response["embeddings"])
+
+        return all_embeddings
+
+    def embed_query(self, query: str) -> list:
+        """
+        Gera embedding para uma consulta.
+        """
+
         enhanced_query = (
             "risco agroclimático agricultura clima lavoura trigo soja "
             f"Passo Fundo RS: {query}"
         )
 
-        embedding = self.model.encode(
-            enhanced_query,
-            normalize_embeddings=True
+        response = embed(
+            model=self.model_name,
+            input=enhanced_query
         )
 
-        return embedding.tolist()
+        return response["embeddings"][0]

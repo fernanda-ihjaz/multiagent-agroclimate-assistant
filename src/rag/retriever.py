@@ -2,7 +2,6 @@ from pathlib import Path
 
 import chromadb
 import numpy as np
-from sentence_transformers import CrossEncoder
 
 from src.rag.embeddings import EmbeddingModel
 
@@ -11,20 +10,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 VECTORSTORE_DIR = PROJECT_ROOT / "data" / "vectorstore"
 COLLECTION_NAME = "agroclimate_knowledge_base"
 
+RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
 
 class Retriever:
-    #busca vetorial no Chroma
-    #filtro opcional por categoria
-    #MMR para diversidade
-    #reranking com CrossEncoder
-    #preservação correta do vínculo documento-metadado
 
     def __init__(self):
         self.embedding_model = EmbeddingModel()
-
-        self.reranker = CrossEncoder(
-            "BAAI/bge-reranker-base"
-        )
+        self._reranker = None
 
         self.client = chromadb.PersistentClient(
             path=str(VECTORSTORE_DIR)
@@ -34,10 +27,19 @@ class Retriever:
             COLLECTION_NAME
         )
 
+    @property
+    def reranker(self):
+        if self._reranker is None:
+            from sentence_transformers import CrossEncoder
+            self._reranker = CrossEncoder(
+                RERANKER_MODEL,
+                max_length=512
+            )
+        return self._reranker
+
     def _cosine(self, a, b):
-        #calcula similaridade de cosseno entre dois vetores
-        a = np.array(a)
-        b = np.array(b)
+        a = np.array(a, dtype=np.float32)
+        b = np.array(b, dtype=np.float32)
 
         norm_a = np.linalg.norm(a)
         norm_b = np.linalg.norm(b)
@@ -47,29 +49,14 @@ class Retriever:
 
         return float(np.dot(a, b) / (norm_a * norm_b))
 
-    def _mmr(
-        self,
-        query_vec,
-        items,
-        k=5,
-        lambda_param=0.5
-    ):
+    def _mmr(self, query_vec, items, k=5, lambda_param=0.5):
+        if not items:
+            return []
 
         selected = []
         selected_idx = []
-
-        if not items:
-            return selected
-
-        doc_vecs = [
-            item["embedding"] for item in items
-        ]
-
-        doc_scores = [
-            self._cosine(query_vec, vec)
-            for vec in doc_vecs
-        ]
-
+        doc_vecs = [item["embedding"] for item in items]
+        doc_scores = [self._cosine(query_vec, vec) for vec in doc_vecs]
         candidates = list(range(len(items)))
 
         while len(selected) < k and candidates:
@@ -78,28 +65,22 @@ class Retriever:
             for i in candidates:
                 sim_to_query = doc_scores[i]
 
-                if not selected_idx:
-                    diversity_penalty = 0.0
-                else:
-                    diversity_penalty = max(
+                diversity_penalty = (
+                    max(
                         self._cosine(doc_vecs[i], doc_vecs[j])
                         for j in selected_idx
                     )
+                    if selected_idx
+                    else 0.0
+                )
 
                 mmr_score = (
                     lambda_param * sim_to_query
                     - (1 - lambda_param) * diversity_penalty
                 )
+                mmr_scores.append((mmr_score, i))
 
-                mmr_scores.append(
-                    (mmr_score, i)
-                )
-
-            _, best_idx = max(
-                mmr_scores,
-                key=lambda x: x[0]
-            )
-
+            _, best_idx = max(mmr_scores, key=lambda x: x[0])
             selected.append(items[best_idx])
             selected_idx.append(best_idx)
             candidates.remove(best_idx)
@@ -107,62 +88,42 @@ class Retriever:
         return selected
 
     def _rerank(self, query, items):
-
-        #reordena os documentos usando CrossEncoder
         if not items:
             return []
 
-        pairs = [
-            (query, item["document"])
-            for item in items
-        ]
+        try:
+            pairs = [(query, item["document"][:512]) for item in items]
+            scores = self.reranker.predict(pairs, batch_size=4)
 
-        scores = self.reranker.predict(pairs)
+            scored = sorted(zip(scores, items), reverse=True, key=lambda x: x[0])
 
-        scored_items = list(
-            zip(scores, items)
-        )
+            return [
+                {**item, "rerank_score": float(score)}
+                for score, item in scored
+            ]
 
-        scored_items.sort(
-            reverse=True,
-            key=lambda x: x[0]
-        )
+        except (MemoryError, OSError):
+            query_vec = self.embedding_model.embed_query(query)
+            scored = sorted(
+                items,
+                reverse=True,
+                key=lambda item: self._cosine(query_vec, item["embedding"])
+            )
+            return [
+                {**item, "rerank_score": self._cosine(query_vec, item["embedding"])}
+                for item in scored
+            ]
 
-        reranked_items = []
-
-        for score, item in scored_items:
-            item = {
-                **item,
-                "rerank_score": float(score)
-            }
-            reranked_items.append(item)
-
-        return reranked_items
-
-    def search(
-        self,
-        query,
-        top_k=5,
-        category=None
-    ):
-        #busca documentos relevantes na base vetorial
+    def search(self, query, top_k=5, category=None):
         query_vec = self.embedding_model.embed_query(query)
 
-        where_filter = (
-            {"category": category}
-            if category
-            else None
-        )
+        where_filter = {"category": category} if category else None
 
         results = self.collection.query(
             query_embeddings=[query_vec],
-            n_results=20,
+            n_results=min(20, self.collection.count()),
             where=where_filter,
-            include=[
-                "documents",
-                "embeddings",
-                "metadatas"
-            ]
+            include=["documents", "embeddings", "metadatas"]
         )
 
         docs = results.get("documents", [[]])[0]
@@ -170,25 +131,12 @@ class Retriever:
         metadatas = results.get("metadatas", [[]])[0]
 
         if not docs:
-            return {
-                "documents": [[]],
-                "metadatas": [[]]
-            }
+            return {"documents": [[]], "metadatas": [[]]}
 
-        items = []
-
-        for doc, metadata, embedding in zip(
-            docs,
-            metadatas,
-            doc_vecs
-        ):
-            items.append(
-                {
-                    "document": doc,
-                    "metadata": metadata,
-                    "embedding": embedding
-                }
-            )
+        items = [
+            {"document": doc, "metadata": meta, "embedding": emb}
+            for doc, meta, emb in zip(docs, metadatas, doc_vecs)
+        ]
 
         mmr_items = self._mmr(
             query_vec=query_vec,
@@ -197,27 +145,15 @@ class Retriever:
             lambda_param=0.5
         )
 
-        reranked_items = self._rerank(
-            query=query,
-            items=mmr_items
-        )
-
+        reranked_items = self._rerank(query=query, items=mmr_items)
         final_items = reranked_items[:top_k]
 
-        documents = [
-            item["document"]
-            for item in final_items
-        ]
-
-        metadatas = [
-            {
-                **item["metadata"],
-                "rerank_score": item.get("rerank_score")
-            }
-            for item in final_items
-        ]
-
         return {
-            "documents": [documents],
-            "metadatas": [metadatas]
+            "documents": [[item["document"] for item in final_items]],
+            "metadatas": [
+                [
+                    {**item["metadata"], "rerank_score": item.get("rerank_score")}
+                    for item in final_items
+                ]
+            ]
         }
